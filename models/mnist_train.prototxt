@@ -1,6 +1,6 @@
 name: "CaffeNet"
-# classification: GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/mnist/classification/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solver.prototxt -gpu 0
-# tripletloss: GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/mnist/tripletloss/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/mnist_pretrained.caffemodel -gpu 0
+# classification: GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/mnist/classification/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/mnist_solver.prototxt -gpu 0
+# tripletloss: GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/mnist/tripletloss/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/mnist_solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/mnist_pretrained.caffemodel -gpu 0
 layer {
   name: "data"
   type: "Data"
