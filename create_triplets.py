@@ -30,10 +30,7 @@ classes_0_ind = {}
 for ix in range(0,len(classes)):
     classes_0_ind[classes[ix]] = ix
 
-batchSize = 30
-tripletSize = batchSize/3
-
-allBatches = []
+allTriplets = []
 for cls in classes:
     print cls
     class_0_ind = classes_0_ind[cls]
@@ -41,29 +38,29 @@ for cls in classes:
     negInds = np.where(allClasses!=int(cls))[0]
     if len(posInds) > 1:
         for ix in range(0,len(posInds)):
-            thisBatch = []
             anchorIm = allIms[posInds[ix]]
-            thesePosInds = [aa for aa in range(len(posInds)) if aa != ix]
-            posIndsToUse = random.sample(thesePosInds,min(len(thesePosInds),10))
-            while len(posIndsToUse) < 10:
-                posIndsToUse.append(random.choice(thesePosInds))
-            for posInd in posIndsToUse:
-                positiveIm = allIms[posInd]
-                negInd = random.choice(negInds)
-                negativeIm = allIms[negInd]
-                negativeImClass = allClasses[negInd]
-                negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
-                thisBatch.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
-#                     new_triplet_file.write('%s,%s,%s,%s,%s,%s\n' % (anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
-            allBatches.append(thisBatch)
+            # pick a positive example from the possible positive examples
+            possiblePosInds = [aa for aa in range(len(posInds)) if aa != ix]
+            posInd = random.choice(possiblePosInds)
+            positiveIm = allIms[posInd]
+            # pick a negative example from the possible negative examples
+            negInd = random.choice(negInds)
+            negativeIm = allIms[negInd]
+            negativeImClass = allClasses[negInd]
+            negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
+            # add this triplet to our list of all triplets
+            allTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
 
-random.shuffle(allBatches)
+random.shuffle(allTriplets)
 
-testBatches = allBatches[:1000]
-trainBatches = allBatches[1001:101001]
+batchSize = 600
+assert batchSize % 3 == 0
 
-smallTestBatches = allBatches[:100]
-smallTrainBatches = allBatches[101:201]
+testTriplets = allTriplets[:batchSize*4]
+trainTriplers = allTriplets[batchSize*4+1:len(allTriplets)-len(allTriplets[batchSize*4+1:])%3]
+
+smallTestTriplets = allTriplets[:batchSize]
+smallTrainTriplets = allTriplets[batchSize+1:batchSize*2]
 
 def write_triplet_file(batches,file_path):
     if os.path.exists(file_path):
