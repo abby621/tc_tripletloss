@@ -35,8 +35,8 @@ class TripletSelectLayer(caffe.Layer):
             anchor = bottom[0].data[i]
             positive = bottom[0].data[i+self.triplet]
             negative = bottom[0].data[i+self.triplet*2]
-            pos_dist = np.dot(anchor-positive,anchor-positive)
-            neg_dist = np.dot(anchor-negative,anchor-negative)
+            pos_dist = np.sum(np.abs(anchor-positive))
+            neg_dist = np.sum(np.abs(anchor-negative))
             if pos_dist > neg_dist:
                 self.no_residual_list.append(i)
 
