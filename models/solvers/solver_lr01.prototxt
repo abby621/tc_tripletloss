@@ -1,4 +1,4 @@
-net: "/project/focus/abby/tc_tripletloss/models/mnist_train.prototxt"
+net: "/project/focus/abby/tc_tripletloss/models/train/overtrain.prototxt"
 test_iter: 1
 test_interval: 500
 base_lr: 0.01
@@ -10,5 +10,5 @@ max_iter: 400000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 10000
-snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/mnist/tripletloss/"
+snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/traffickcam/lr01_"
 solver_mode: GPU
