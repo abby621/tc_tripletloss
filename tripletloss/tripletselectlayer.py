@@ -24,6 +24,10 @@ class TripletSelectLayer(caffe.Layer):
 
     def forward(self, bottom, top):
         """Get blobs and copy them into this layer's top blob vector."""
+        anchors = []
+        positives = []
+        negatives = []
+
         top_anchor = []
         top_positive = []
         top_negative = []
@@ -46,6 +50,8 @@ class TripletSelectLayer(caffe.Layer):
             an = np.dot(a_n,a_n)
             ans[i+self.triplet*2] = an
         ans = sorted(ans.items(), key = lambda d: d[1], reverse = True)
+
+        print aps, ans
 
         for i in range(self.triplet):
             top_anchor.append(bottom[0].data[i])
