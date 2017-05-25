@@ -18,9 +18,9 @@ class TripletSelectLayer(caffe.Layer):
         assert self.batch_size % 3 == 0
         self.triplet = self.batch_size/3
 
-        top[0].reshape(self.triplet,shape(bottom[0].data)[1])
-        top[1].reshape(self.triplet,shape(bottom[0].data)[1])
-        top[2].reshape(self.triplet,shape(bottom[0].data)[1])
+        top[0].reshape(self.triplet,np.shape(bottom[0].data)[1])
+        top[1].reshape(self.triplet,np.shape(bottom[0].data)[1])
+        top[2].reshape(self.triplet,np.shape(bottom[0].data)[1])
 
     def forward(self, bottom, top):
         """Get blobs and copy them into this layer's top blob vector."""
