@@ -1,12 +1,4 @@
-import os
-import numpy as np
-from caffe.io import blobproto_to_array
-from caffe.proto import caffe_pb2
-import cv2
-
 WHICH_DATASET = 'mnist'
-
-blob = caffe_pb2.BlobProto()
 
 if WHICH_DATASET == 'tc':
     TARGET_SIZE = 227
