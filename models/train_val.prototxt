@@ -16,7 +16,7 @@ layer {
   data_param {
     # traffickcam
     source: "/project/focus/datasets/tc_tripletloss/triplet_train_lmdb"
-    batch_size: 30 # if you change the batch size, remember to change in param_str in the triplet loss layers
+    batch_size: 30
     backend: LMDB
   }
 }
@@ -37,7 +37,7 @@ layer {
   data_param {
     # traffickcam
     source: "/project/focus/datasets/tc_tripletloss/test_lmdb"
-    batch_size: 30 # if you change the batch size, remember to change in param_str in the triplet loss layers
+    batch_size: 30
     backend: LMDB
   }
 }
@@ -384,7 +384,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TRAIN","batch_size":30}'
+    param_str:'{"phase":"TRAIN"}'
   }
 }
 layer {
@@ -401,7 +401,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TEST","batch_size":30}'
+    param_str:'{"phase":"TEST"}'
   }
 }
 layer {

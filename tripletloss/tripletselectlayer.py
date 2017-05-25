@@ -9,20 +9,16 @@
 """
 import caffe
 import numpy as np
-from numpy import *
-import yaml
-from multiprocessing import Process, Queue
-from caffe._caffe import RawBlobVec
-from sklearn import preprocessing
-import math
-import json
 
 class TripletSelectLayer(caffe.Layer):
     def setup(self, bottom, top):
         """Setup the TripletSelectLayer."""
-        param = json.loads(self.param_str)
-        print bottom[0].data.shape
-        self.batch_size = param['batch_size']
+        self.batch_size = bottom[0].data.shape[0]
+        self.triplet = self.batch_size/3
+
+        # make sure we actually have triplets...
+        assert self.triplet % 3 == 0
+
         top[0].reshape(self.triplet,shape(bottom[0].data)[1])
         top[1].reshape(self.triplet,shape(bottom[0].data)[1])
         top[2].reshape(self.triplet,shape(bottom[0].data)[1])

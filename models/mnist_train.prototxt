@@ -16,7 +16,7 @@ layer {
   data_param {
     # mnist
     source: "/project/focus/datasets/mnist/triplet_train_lmdb"
-    batch_size: 270 # if you change the batch size, remember to change in param_str in the triplet loss layers
+    batch_size: 270
     backend: LMDB
   }
 }
@@ -37,7 +37,7 @@ layer {
   data_param {
     #mnist
     source: "/project/focus/datasets/mnist/mnist_test_lmdb"
-    batch_size: 270 # if you change the batch size, remember to change in param_str in the triplet loss layers
+    batch_size: 270
     backend: LMDB
   }
 }
@@ -186,7 +186,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TRAIN","batch_size":270}'
+    param_str:'{"phase":"TRAIN"}'
   }
 }
 layer {
@@ -203,7 +203,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TEST","batch_size":270}'
+    param_str:'{"phase":"TEST"}'
   }
 }
 layer {
