@@ -15,7 +15,6 @@ from multiprocessing import Process, Queue
 from caffe._caffe import RawBlobVec
 from sklearn import preprocessing
 import math
-import config
 import json
 
 class TripletSelectLayer(caffe.Layer):
