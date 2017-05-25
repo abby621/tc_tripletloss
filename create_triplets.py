@@ -41,15 +41,17 @@ for cls in classes:
             anchorIm = allIms[posInds[ix]]
             # pick a positive example from the possible positive examples
             possiblePosInds = [aa for aa in range(len(posInds)) if aa != ix]
-            posInd = random.choice(possiblePosInds)
-            positiveIm = allIms[posInd]
-            # pick a negative example from the possible negative examples
-            negInd = random.choice(negInds)
-            negativeIm = allIms[negInd]
-            negativeImClass = allClasses[negInd]
-            negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
-            # add this triplet to our list of all triplets
-            allTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
+            random.shuffle(possiblePosInds)
+            for iy in range(min(10,len(possiblePosInds))):
+                posInd = possiblePosInds[iy]
+                positiveIm = allIms[posInd]
+                # pick a negative example from the possible negative examples
+                negInd = random.choice(negInds)
+                negativeIm = allIms[negInd]
+                negativeImClass = allClasses[negInd]
+                negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
+                # add this triplet to our list of all triplets
+                allTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
 
 random.shuffle(allTriplets)
 
