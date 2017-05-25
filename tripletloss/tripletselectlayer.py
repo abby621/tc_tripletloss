@@ -22,11 +22,8 @@ class TripletSelectLayer(caffe.Layer):
     def setup(self, bottom, top):
         """Setup the TripletSelectLayer."""
         param = json.loads(self.param_str)
-        self.phase = param['phase']
-        if self.phase == 'TRAIN':
-            self.triplet = config.TRAIN_BATCH_SIZE/3
-        else:
-            self.triplet = config.TEST_BATCH_SIZE/3
+        print bottom[0].data.shape
+        self.batch_size = param['batch_size']
         top[0].reshape(self.triplet,shape(bottom[0].data)[1])
         top[1].reshape(self.triplet,shape(bottom[0].data)[1])
         top[2].reshape(self.triplet,shape(bottom[0].data)[1])
