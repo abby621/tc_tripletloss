@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import random
+import os
 
 im_file = '/project/focus/datasets/tc_tripletloss/triplet_train_roomsonly.txt'
 with open(im_file,'rU') as f:
