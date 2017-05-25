@@ -186,7 +186,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TRAIN";"batch_size":270}'
+    param_str:'{"phase":"TRAIN","batch_size":270}'
   }
 }
 layer {
@@ -203,7 +203,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TEST";"batch_size":270}'
+    param_str:'{"phase":"TEST","batch_size":270}'
   }
 }
 layer {
