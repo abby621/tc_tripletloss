@@ -17,7 +17,7 @@ layer {
   }
   data_param {
     # mnist
-    source: "/project/focus/datasets/mnist/mnist_train_lmdb"
+    source: "/project/focus/datasets/mnist/triplet_train_lmdb"
     batch_size: 270
     backend: LMDB
   }
@@ -147,116 +147,117 @@ layer {
     dropout_ratio: 0.5
   }
 }
-layer {
-  name: "ip2"
-  type: "InnerProduct"
-  bottom: "ip1"
-  top: "ip2"
-  param {
-    lr_mult: 1
-  }
-  param {
-    lr_mult: 2
-  }
-  inner_product_param {
-    num_output: 10
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-layer {
-  name: "accuracy"
-  type: "Accuracy"
-  bottom: "ip2"
-  bottom: "label"
-  top: "accuracy"
-  include {
-    phase: TEST
-  }
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "ip2"
-  bottom: "label"
-  top: "loss"
-}
-#====================tripletloss==================
+# #=================classification==================
 # layer {
-#  name: "norm2"
-#  type: "Python"
-#  bottom: "ip1"
-#  top: "norm2"
-#  python_param {
-#    module: "norm2layer"
-#    layer: "Norm2Layer"
-#  }
-# }
-# layer {
-#  name: "ip3"
-#  type: "InnerProduct"
-#  bottom: "norm2"
-#  top: "ip3"
-#  param {
-#     lr_mult: 10
-#     decay_mult: 0
+#   name: "ip2"
+#   type: "InnerProduct"
+#   bottom: "ip1"
+#   top: "ip2"
+#   param {
+#     lr_mult: 1
+#   }
+#   param {
+#     lr_mult: 2
 #   }
 #   inner_product_param {
-#     num_output: 128
+#     num_output: 10
 #     weight_filler {
 #       type: "xavier"
+#     }
+#     bias_filler {
+#       type: "constant"
 #     }
 #   }
 # }
 # layer {
-#   name: "triplet_select"
-#   type: "Python"
-#   bottom: "ip3"
+#   name: "accuracy"
+#   type: "Accuracy"
+#   bottom: "ip2"
 #   bottom: "label"
-#   top: "anchor"
-#   top: "positive"
-#   top: "negative"
-#   include {
-#     phase: TRAIN
-#   }
-#   python_param {
-#     module: "tripletselectlayer"
-#     layer: "TripletSelectLayer"
-#     param_str:'{"phase":"TRAIN"}'
-#   }
-# }
-# layer {
-#   name: "triplet_select"
-#   type: "Python"
-#   bottom: "ip3"
-#   bottom: "label"
-#   top: "anchor"
-#   top: "positive"
-#   top: "negative"
+#   top: "accuracy"
 #   include {
 #     phase: TEST
 #   }
-#   python_param {
-#     module: "tripletselectlayer"
-#     layer: "TripletSelectLayer"
-#     param_str:'{"phase":"TEST"}'
-#   }
 # }
 # layer {
-#   name: "tripletloss"
-#   type: "Python"
-#   bottom: "anchor"
-#   bottom: "positive"
-#   bottom: "negative"
-#   top: "tripletloss"
-#
-#   python_param {
-#     module: "tripletlosslayer"
-#     layer: "TripletLayer"
-#   }
-#   loss_weight: 1
+#   name: "loss"
+#   type: "SoftmaxWithLoss"
+#   bottom: "ip2"
+#   bottom: "label"
+#   top: "loss"
 # }
+#====================tripletloss==================
+layer {
+ name: "norm2"
+ type: "Python"
+ bottom: "ip1"
+ top: "norm2"
+ python_param {
+   module: "norm2layer"
+   layer: "Norm2Layer"
+ }
+}
+layer {
+ name: "ip3"
+ type: "InnerProduct"
+ bottom: "norm2"
+ top: "ip3"
+ param {
+    lr_mult: 10
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 128
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "triplet_select"
+  type: "Python"
+  bottom: "ip3"
+  bottom: "label"
+  top: "anchor"
+  top: "positive"
+  top: "negative"
+  include {
+    phase: TRAIN
+  }
+  python_param {
+    module: "tripletselectlayer"
+    layer: "TripletSelectLayer"
+    param_str:'{"phase":"TRAIN"}'
+  }
+}
+layer {
+  name: "triplet_select"
+  type: "Python"
+  bottom: "ip3"
+  bottom: "label"
+  top: "anchor"
+  top: "positive"
+  top: "negative"
+  include {
+    phase: TEST
+  }
+  python_param {
+    module: "tripletselectlayer"
+    layer: "TripletSelectLayer"
+    param_str:'{"phase":"TEST"}'
+  }
+}
+layer {
+  name: "tripletloss"
+  type: "Python"
+  bottom: "anchor"
+  bottom: "positive"
+  bottom: "negative"
+  top: "tripletloss"
+
+  python_param {
+    module: "tripletlosslayer"
+    layer: "TripletLayer"
+  }
+  loss_weight: 1
+}
