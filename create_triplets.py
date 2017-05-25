@@ -57,32 +57,33 @@ batchSize = 600
 assert batchSize % 3 == 0
 
 testTriplets = allTriplets[:batchSize*4]
-trainTriplers = allTriplets[batchSize*4+1:len(allTriplets)-len(allTriplets[batchSize*4+1:])%3]
+trainTriplets = allTriplets[batchSize*4+1:len(allTriplets)-len(allTriplets[batchSize*4+1:])%3]
 
 smallTestTriplets = allTriplets[:batchSize]
 smallTrainTriplets = allTriplets[batchSize+1:batchSize*2]
 
-def write_triplet_file(batches,file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    txt_file = open(file_path,'a')
-    for batch in batches:
+def write_triplet_file(triplets,batchSize,filePath):
+    if os.path.exists(filePath):
+        os.remove(filePath)
+    txtFile = open(filePath,'a')
+    for ix in range(0,len(triplets),batchSize):
         anchorIms = []
         positiveIms = []
         negativeIms = []
+        batch = triplets[ix:ix+batchSize/3]
         for triplet in batch:
             anchorIms.append((triplet[0],triplet[1]))
             positiveIms.append((triplet[2],triplet[3]))
             negativeIms.append((triplet[4],triplet[5]))
         for a in anchorIms:
-            txt_file.write('%s %s\n' % (a[0],a[1]))
+            txtFile.write('%s %s\n' % (a[0],a[1]))
         for p in positiveIms:
-            txt_file.write('%s %s\n' % (p[0],p[1]))
+            txtFile.write('%s %s\n' % (p[0],p[1]))
         for n in negativeIms:
-            txt_file.write('%s %s\n' % (n[0],n[1]))
-    txt_file.close()
+            txtFile.write('%s %s\n' % (n[0],n[1]))
+    txtFile.close()
 
-write_triplet_file(trainBatches,'/project/focus/datasets/tc_tripletloss/train_triplets.txt')
-write_triplet_file(testBatches,'/project/focus/datasets/tc_tripletloss/test_triplets.txt')
-write_triplet_file(smallTrainBatches,'/project/focus/datasets/tc_tripletloss/small_train_triplets.txt')
-write_triplet_file(smallTestBatches,'/project/focus/datasets/tc_tripletloss/small_test_triplets.txt')
+write_triplet_file(trainTriplets,batchSize,'/project/focus/datasets/tc_tripletloss/train_triplets.txt')
+write_triplet_file(testTriplets,batchSize,'/project/focus/datasets/tc_tripletloss/test_triplets.txt')
+write_triplet_file(smallTrainTriplets,batchSize,'/project/focus/datasets/tc_tripletloss/small_train_triplets.txt')
+write_triplet_file(smallTestTriplets,batchSize,'/project/focus/datasets/tc_tripletloss/small_test_triplets.txt')
