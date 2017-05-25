@@ -28,42 +28,59 @@ class TripletSelectLayer(caffe.Layer):
         positives = []
         negatives = []
 
-        top_anchor = []
-        top_positive = []
-        top_negative = []
-        labels = []
         self.tripletlist = []
         self.no_residual_list=[]
-        aps = {}
-        ans = {}
-
-        anchor_feature = bottom[0].data[0]
-        for i in range(self.triplet):
-            positive_feature = bottom[0].data[i+self.triplet]
-            a_p = anchor_feature - positive_feature
-            ap = np.dot(a_p,a_p) # sum of squared error -- maybe convert to difference of absolute value
-            aps[i+self.triplet] = ap
-        aps = sorted(aps.items(), key = lambda d: d[1], reverse = True)
-        for i in range(self.triplet):
-            negative_feature = bottom[0].data[i+self.triplet*2]
-            a_n = anchor_feature - negative_feature
-            an = np.dot(a_n,a_n)
-            ans[i+self.triplet*2] = an
-        ans = sorted(ans.items(), key = lambda d: d[1], reverse = True)
-
-        print aps, ans
 
         for i in range(self.triplet):
-            top_anchor.append(bottom[0].data[i])
-            top_positive.append(bottom[0].data[aps[i][0]])
-            top_negative.append(bottom[0].data[ans[i][0]])
-            if aps[i][1] >= ans[i][1]:
-               self.no_residual_list.append(i)
-            self.tripletlist.append([i,aps[i][0],ans[i][0]])
+            anchor = bottom[0].data[i]
+            positive = bottom[0].data[i+self.triplet]
+            negative = bottom[0].data[i+self.triplet*2]
+            pos_dist = np.dot(anchor-positive,anchor-positive)
+            neg_dist = np.dot(anchor-negative,anchor-negative)
+            if pos_dist > neg_dist:
+                self.no_residual_list.append(i)
 
-        top[0].data[...] = np.array(top_anchor).astype(np.float32)
-        top[1].data[...] = np.array(top_positive).astype(np.float32)
-        top[2].data[...] = np.array(top_negative).astype(np.float32)
+            anchors.append(anchor)
+            positives.append(positive)
+            negatives.append(negative)
+            self.tripletlist.append([i,i+self.triplet,i+self.triplet*2])
+
+        top[0].data[...] = np.array(anchors).astype(np.float32)
+        top[1].data[...] = np.array(positives).astype(np.float32)
+        top[2].data[...] = np.array(negatives).astype(np.float32)
+
+        # top_anchor = []
+        # top_positive = []
+        # top_negative = []
+        #
+        # aps = {}
+        # ans = {}
+        #
+        # anchor_feature = bottom[0].data[0]
+        # for i in range(self.triplet):
+        #     positive_feature = bottom[0].data[i+self.triplet]
+        #     a_p = anchor_feature - positive_feature
+        #     ap = np.dot(a_p,a_p) # sum of squared error -- maybe convert to difference of absolute value
+        #     aps[i+self.triplet] = ap
+        # aps = sorted(aps.items(), key = lambda d: d[1], reverse = True)
+        # for i in range(self.triplet):
+        #     negative_feature = bottom[0].data[i+self.triplet*2]
+        #     a_n = anchor_feature - negative_feature
+        #     an = np.dot(a_n,a_n)
+        #     ans[i+self.triplet*2] = an
+        # ans = sorted(ans.items(), key = lambda d: d[1], reverse = True)
+        #
+        # for i in range(self.triplet):
+        #     top_anchor.append(bottom[0].data[i])
+        #     top_positive.append(bottom[0].data[aps[i][0]])
+        #     top_negative.append(bottom[0].data[ans[i][0]])
+        #     if aps[i][1] >= ans[i][1]:
+        #        self.no_residual_list.append(i)
+        #     self.tripletlist.append([i,aps[i][0],ans[i][0]])
+        #
+        # top[0].data[...] = np.array(top_anchor).astype(np.float32)
+        # top[1].data[...] = np.array(top_positive).astype(np.float32)
+        # top[2].data[...] = np.array(top_negative).astype(np.float32)
 
     def backward(self, top, propagate_down, bottom):
         for i in range(len(self.tripletlist)):
