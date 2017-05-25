@@ -147,7 +147,6 @@ layer {
     dropout_ratio: 0.5
   }
 }
-#==================classification=================
 layer {
   name: "ip2"
   type: "InnerProduct"
