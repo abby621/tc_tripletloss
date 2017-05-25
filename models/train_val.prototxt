@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "CaffeNet" # GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/tc/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 layer {
   name: "data"
   type: "Data"
@@ -8,21 +8,15 @@ layer {
     phase: TRAIN
   }
   transform_param {
-    mirror: false
-    # mnist
-    crop_size: 28
-    mean_file: "/project/focus/datasets/mnist/mnist_mean.binaryproto"
-    ## traffickcam
-    # crop_size: 227
-    # mean_file: "/project/focus/datasets/tc_tripletloss/mean.binaryproto"
+    mirror: true
+    # traffickcam
+    crop_size: 227
+    mean_file: "/project/focus/datasets/tc_tripletloss/mean.binaryproto"
   }
   data_param {
-    # mnist
-    source: "/project/focus/datasets/mnist/triplet_train_lmdb"
-    batch_size: 270
-    ## traffickcam
-    # source: "/project/focus/datasets/tc_tripletloss/triplet_train_lmdb"
-    # batch_size: 30
+    # traffickcam
+    source: "/project/focus/datasets/tc_tripletloss/triplet_train_lmdb"
+    batch_size: 30 # if you change the batch size, remember to change in param_str in the triplet loss layers
     backend: LMDB
   }
 }
@@ -36,20 +30,14 @@ layer {
   }
   transform_param {
     mirror: false
-    # mnist
-    crop_size: 28
-    mean_file: "/project/focus/datasets/mnist/mnist_mean.binaryproto"
-    ## traffickcam
-    # crop_size: 227
-    # mean_file: "/project/focus/datasets/tc_tripletloss/mean.binaryproto"
+    # traffickcam
+    crop_size: 227
+    mean_file: "/project/focus/datasets/tc_tripletloss/mean.binaryproto"
   }
   data_param {
-    #mnist
-    source: "/project/focus/datasets/mnist/mnist_test_lmdb"
-    batch_size: 270
-    ## traffickcam
-    # source: "/project/focus/datasets/tc_tripletloss/test_lmdb"
-    # batch_size: 30
+    # traffickcam
+    source: "/project/focus/datasets/tc_tripletloss/test_lmdb"
+    batch_size: 30 # if you change the batch size, remember to change in param_str in the triplet loss layers
     backend: LMDB
   }
 }
@@ -396,7 +384,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TRAIN"}'
+    param_str:'{"phase":"TRAIN";"batch_size":30}'
   }
 }
 layer {
@@ -413,7 +401,7 @@ layer {
   python_param {
     module: "tripletselectlayer"
     layer: "TripletSelectLayer"
-    param_str:'{"phase":"TEST"}'
+    param_str:'{"phase":"TEST";"batch_size":30}'
   }
 }
 layer {
