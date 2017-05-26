@@ -12,6 +12,7 @@ rm -r /project/focus/datasets/tc_tripletloss/triplet_train_lmdb
 $CAFFE_ROOT/build/tools/convert_imageset --resize_height 227 --resize_width 227 / /project/focus/datasets/tc_tripletloss/train_triplets.txt /project/focus/datasets/tc_tripletloss/triplet_train_lmdb
 
 # overtrain to find good learning rate
+cd /project/focus/abby/tc_tripletloss/tripletloss/
 screen -S lr01
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr01.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 screen -S lr001
@@ -20,8 +21,9 @@ screen -S lr0001
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
 screen -S lr05
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr05/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr05.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
+# we'll run out of memory if we try to run these next two at the same time, so let the first ones run first
 screen -S lr005
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 screen -S lr0005
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
 
@@ -32,6 +34,7 @@ screen -X -S lr0001 quit
 screen -X -S lr05 quit
 screen -X -S lr005 quit
 screen -X -S lr0005 quit
+# also make sure to either quit the jobs first or run nvidia-smi and kill any lingering tasks (the screen quit doesn't kill the training task)
 
 # if for some reason, we stop and start over again and need to delete the logs: rm /project/focus/abby/tc_tripletloss/models/logs/traffickcam/*/*
 
