@@ -47,13 +47,13 @@ class TripletLayer(caffe.Layer):
             a = np.array(anchor_minibatch_db[i])
             p = np.array(positive_minibatch_db[i])
             n = np.array(negative_minibatch_db[i])
-            # a_p = a - p
-            # a_n = a - n
-            # ap = np.dot(a_p,a_p)
-            # an = np.dot(a_n,a_n)
-            ap = np.sum(np.abs(a - p))
-            an = np.sum(np.abs(a - n))
-            
+            a_p = a - p
+            a_n = a - n
+            ap = np.dot(a_p,a_p)
+            an = np.dot(a_n,a_n)
+            # ap = np.sum(np.abs(a - p))
+            # an = np.sum(np.abs(a - n))
+
             # margin is the distance away that the negative examples need to be
             dist = (self.margin + ap - an)
             _loss = max(dist,0.0)
