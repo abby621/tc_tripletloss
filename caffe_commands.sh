@@ -23,16 +23,16 @@ screen -S lr01
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr01/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr01.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
 screen -S lr05
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr05/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr05.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
-#
+# if those are too high:
 screen -S lr001
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
 screen -S lr005
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
 #
 screen -S lr0001
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
 screen -S lr0005
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 
 # once they've run long enough to over train, close the screens
 screen -X -S lr1 quit
@@ -80,8 +80,16 @@ $CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/l
 mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/caffe.INFO.train /project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/lr0005.train
 mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/caffe.INFO.test /project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/lr0005.test
 
+# if we want to copy these to whatever local machine we're on:
+mkdir ~/Desktop/overtrain
+mkdir ~/Desktop/overtrain/train
+mkdir ~/Desktop/overtrain/test
+scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/*/*.train ~/Desktop/overtrain/train/
+scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/*/*.test ~/Desktop/overtrain/test/
+
 # once we determine a good learning rate, update models/solver/solver.prototxt to reflect that learning rate
 # train, storing log information
+screen -S tc_train
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 # parse logs
 $CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/
