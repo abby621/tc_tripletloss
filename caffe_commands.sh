@@ -90,6 +90,6 @@ scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/log
 # once we determine a good learning rate, update models/solver/solver.prototxt to reflect that learning rate
 # train, storing log information
 screen -S tc_train
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 # parse logs
 $CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/
