@@ -43,7 +43,7 @@ for cls in classes:
             possiblePosInds = [aa for aa in range(len(posInds)) if aa != ix]
             random.shuffle(possiblePosInds)
             for iy in range(min(10,len(possiblePosInds))):
-                posInd = possiblePosInds[iy]
+                posInd = posInds[possiblePosInds[iy]]
                 positiveIm = allIms[posInd]
                 # pick a negative example from the possible negative examples
                 negInd = random.choice(negInds)
@@ -53,12 +53,15 @@ for cls in classes:
                 # add this triplet to our list of all triplets
                 allTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
 
-random.shuffle(allTriplets)
+randomOrder = range(len(allTriplets))
+random.shuffle(randomOrder)
+shuffledTriplets = [allTriplets[aa] for aa in randomOrder]
 
 batchSize = 600
 assert batchSize % 3 == 0
 
 testTriplets = allTriplets[:batchSize*4]
+# grab everything else as train triplets, but make sure it's divisible by 3
 trainTriplets = allTriplets[batchSize*4+1:len(allTriplets)-len(allTriplets[batchSize*4+1:])%3]
 
 smallTestTriplets = allTriplets[:batchSize]
