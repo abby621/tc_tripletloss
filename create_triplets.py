@@ -3,6 +3,40 @@ import numpy as np
 import random
 import os
 
+# =========== if we need to compute features, start here, else jump down ====================
+import caffe
+import cv2
+from caffe.io import blobproto_to_array
+from caffe.proto import caffe_pb2
+
+def getFeats(ims,net,feat_layer):
+    net.blobs['data'].reshape(len(ims),3,227,227)
+    transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
+    transformer.set_mean('data', IM_MEAN)
+    transformer.set_transpose('data', (2,0,1))
+    transformer.set_channel_swap('data', (2,1,0))
+    transformer.set_raw_scale('data', 255.0)
+    caffe_input = np.empty((len(ims),3,227,227))
+    for ix in range(len(ims)):
+        caffe_input[ix,:,:,:] = transformer.preprocess('data',caffe.io.load_image(ims[ix]))
+    net.blobs['data'].data[...] = caffe_input
+    out = net.forward()
+    feat = net.blobs[feat_layer].data.copy()
+    return feat
+
+caffe.set_device(0)
+caffe.set_mode_gpu()
+
+net_model = '/project/focus/abby/tc_tripletloss/models/deploy/deploy.prototxt'
+net_weights = '/project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel'
+net = caffe.Net(net_model, net_weights,caffe.TEST)
+
+blob = caffe_pb2.BlobProto()
+data = open('/project/focus/datasets/tc_tripletloss/mean.binaryproto', 'rb' ).read()
+blob.ParseFromString(data)
+arr = np.array(blobproto_to_array(blob))
+IM_MEAN = arr.squeeze()
+
 im_file = '/project/focus/datasets/tc_tripletloss/triplet_train_roomsonly.txt'
 with open(im_file,'rU') as f:
     rd = csv.reader(f,delimiter=' ')
@@ -25,10 +59,43 @@ for cls in classes:
     allIms.extend(ims_by_class[cls])
     startInd += len(ims_by_class[cls])
 
+# hack to make sure we have batches of 100, this is dumb
+while len(allIms)%100 != 0:
+    allClasses = np.append(allClasses,int(cls))
+    allIms.append(ims_by_class[cls][0])
+
 # RANDOM
 classes_0_ind = {}
 for ix in range(0,len(classes)):
     classes_0_ind[classes[ix]] = ix
+
+allFeats = np.empty((len(allIms),365))
+inds = range(0,len(allIms),100)
+ctr = 0
+for ind in inds:
+    print ctr, ' of ', len(inds)
+    ims = allIms[ind:ind+100]
+    feat = getFeats(ims,net,'fc8')
+    allFeats[ind:ind+100,:] = feat.squeeze()
+    ctr += 1
+
+np.save('/project/focus/abby/tc_tripletloss/classes.npy',allClasses)
+np.save('/project/focus/abby/tc_tripletloss/ims.npy',np.asarray(allIms))
+np.save('/project/focus/abby/tc_tripletloss/feats.npy',allFeats)
+np.save('/project/focus/abby/tc_tripletloss/classes_0_ind.npy',classes_0_ind)
+
+# =========== if we loaded from files, start here:
+def getDist(feat,otherFeat):
+    dist = (otherFeat - feat)**2
+    dist = np.sum(dist)
+    dist = np.sqrt(dist)
+    return dist
+
+allClasses = np.load('/project/focus/abby/tc_tripletloss/classes.npy')
+allIms = np.load('/project/focus/abby/tc_tripletloss/ims.npy')
+allFeats = np.load('/project/focus/abby/tc_tripletloss/feats.npy')
+classes_0_ind = np.load('/project/focus/abby/tc_tripletloss/classes_0_ind.npy').item()
+classes = classes_0_ind.keys()
 
 allTriplets = []
 for cls in classes:
@@ -39,19 +106,33 @@ for cls in classes:
     if len(posInds) > 1:
         for ix in range(0,len(posInds)):
             anchorIm = allIms[posInds[ix]]
+            anchorFeat = allFeats[posInds[ix]]
             # pick a positive example from the possible positive examples
-            possiblePosInds = [aa for aa in range(len(posInds)) if aa != ix]
-            random.shuffle(possiblePosInds)
-            for iy in range(min(10,len(possiblePosInds))):
-                posInd = posInds[possiblePosInds[iy]]
+            possiblePosInds = [aa for aa in range(len(posInds)) if allIms[posInds[aa]] != anchorIm]
+            theseTriplets = []
+            ctr = 0
+            while ctr < len(possiblePosInds) and len(theseTriplets) <= 10:
+                posInd = posInds[possiblePosInds[ctr]]
                 positiveIm = allIms[posInd]
-                # pick a negative example from the possible negative examples
-                negInd = random.choice(negInds)
-                negativeIm = allIms[negInd]
-                negativeImClass = allClasses[negInd]
-                negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
-                # add this triplet to our list of all triplets
-                allTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
+                positiveFeat = allFeats[posInd]
+                posDist = getDist(anchorFeat,positiveFeat)
+                if posDist < 32:
+                    # pick a negative example from the possible negative examples
+                    negDist = 1000000
+                    tries = 0
+                    while negDist > posDist and tries < 100:
+                        tries += 1
+                        negInd = random.choice(negInds)
+                        negFeat = allFeats[negInd]
+                        negDist = getDist(anchorFeat,negFeat)
+                        if negDist <= posDist:
+                            negativeIm = allIms[negInd]
+                            negativeImClass = allClasses[negInd]
+                            negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
+                            # add this triplet to our list of all triplets
+                            theseTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
+                ctr += 1
+            allTriplets.extend(theseTriplets)
 
 randomOrder = range(len(allTriplets))
 random.shuffle(randomOrder)
@@ -60,12 +141,12 @@ shuffledTriplets = [allTriplets[aa] for aa in randomOrder]
 batchSize = 600
 assert batchSize % 3 == 0
 
-testTriplets = allTriplets[:batchSize*4]
+testTriplets = shuffledTriplets[:batchSize*4]
 # grab everything else as train triplets, but make sure it's divisible by 3
-trainTriplets = allTriplets[batchSize*4+1:len(allTriplets)-len(allTriplets[batchSize*4+1:])%3]
+trainTriplets = shuffledTriplets[batchSize*4+1:len(shuffledTriplets)-len(shuffledTriplets[batchSize*4+1:])%3]
 
-smallTestTriplets = allTriplets[:batchSize]
-smallTrainTriplets = allTriplets[batchSize+1:batchSize*2]
+smallTestTriplets = shuffledTriplets[:batchSize]
+smallTrainTriplets = shuffledTriplets[batchSize+1:batchSize*2]
 
 def write_triplet_file(triplets,batchSize,filePath):
     if os.path.exists(filePath):
