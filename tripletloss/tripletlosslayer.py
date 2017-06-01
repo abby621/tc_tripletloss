@@ -24,8 +24,9 @@ class TripletLayer(caffe.Layer):
         assert shape(bottom[0].data) == shape(bottom[1].data)
         assert shape(bottom[0].data) == shape(bottom[2].data)
 
-        layer_params = yaml.load(self.param_str_)
+        layer_params = yaml.load(self.param_str)
         self.margin = layer_params['margin']
+        print self.margin
         # self.margin = .2
 
         self.a = 1
