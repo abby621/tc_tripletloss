@@ -15,7 +15,7 @@ layer {
   }
   data_param {
     # traffickcam
-    source: "/project/focus/datasets/tc_tripletloss/triplet_train_lmdb"
+    source: "/project/focus/datasets/tc_tripletloss/small_triplet_train_lmdb"
     batch_size: 600
     backend: LMDB
   }
@@ -36,7 +36,7 @@ layer {
   }
   data_param {
     # traffickcam
-    source: "/project/focus/datasets/tc_tripletloss/triplet_test_lmdb"
+    source: "/project/focus/datasets/tc_tripletloss/small_triplet_test_lmdb"
     batch_size: 600
     backend: LMDB
   }
