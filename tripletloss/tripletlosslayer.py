@@ -9,10 +9,10 @@
 import caffe
 import numpy as np
 from numpy import *
-import yaml
 from multiprocessing import Process, Queue
 from caffe._caffe import RawBlobVec
 from sklearn import preprocessing
+import json
 
 class TripletLayer(caffe.Layer):
 
@@ -24,9 +24,9 @@ class TripletLayer(caffe.Layer):
         assert shape(bottom[0].data) == shape(bottom[1].data)
         assert shape(bottom[0].data) == shape(bottom[2].data)
 
-        # layer_params = yaml.load(self.param_str_)
-        # self.margin = layer_params['margin']
-        self.margin = .2
+        layer_params = yaml.load(self.param_str_)
+        self.margin = layer_params['margin']
+        # self.margin = .2
 
         self.a = 1
         top[0].reshape(1)

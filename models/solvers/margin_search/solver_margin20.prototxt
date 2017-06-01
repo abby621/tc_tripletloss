@@ -1,0 +1,14 @@
+net: "/project/focus/abby/tc_tripletloss/models/train/margin_search/train_margin20.prototxt"
+test_iter: 1
+test_interval: 10
+base_lr: 0.01
+lr_policy: "step"
+gamma: 0.1
+stepsize: 200000
+display: 10
+max_iter: 400
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/traffickcam/margin_search/margin20_"
+solver_mode: GPU

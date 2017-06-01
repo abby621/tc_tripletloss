@@ -87,11 +87,57 @@ mkdir ~/Desktop/overtrain/test
 scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/*/*.train ~/Desktop/overtrain/train/
 scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/*/*.test ~/Desktop/overtrain/test/
 
+# once we have a good learning rate, we need to figure out a good margin
+screen -S margin1
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/margin_search/solver_margin1.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
+screen -S margin5
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/  $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/margin_search/solver_margin5.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
+#
+screen -S margin10
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/  $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/margin_search/solver_margin10.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+screen -S margin20
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/  $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/margin_search/solver_margin20.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
+
+screen -X -S margin1 quit
+screen -X -S margin5 quit
+screen -X -S margin10 quit
+screen -X -S margin20 quit
+
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/caffe.INFO.train /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/lr1.train
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/caffe.INFO.test /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin1/lr1.test
+
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/caffe.INFO.train /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/lr5.train
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/caffe.INFO.test /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin5/lr5.test
+
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/caffe.INFO.train /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/lr01.train
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/caffe.INFO.test /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin10/lr01.test
+
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/caffe.INFO.train /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/lr05.train
+mv /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/caffe.INFO.test /project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/margin20/lr05.test
+
+mkdir ~/Desktop/margin_search
+mkdir ~/Desktop/margin_search/train
+mkdir ~/Desktop/margin_search/test
+scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/*/*.train ~/Desktop/margin_search/train/
+scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/margin_search/*/*.test ~/Desktop/margin_search/test/
+
 # once we determine a good learning rate, update models/solver/solver.prototxt to reflect that learning rate
 # train, storing log information
 screen -S tc_train
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/
+# scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01 ~/Desktop
+
 screen -S tc_train_lr001
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
-# parse logs
-$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/
+# scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001 ~/Desktop
+
+screen -S tc_train_lr1
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/
+# scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr1/caffe.INFO.t* ~/Desktop
