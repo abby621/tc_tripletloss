@@ -12,7 +12,7 @@ from numpy import *
 from multiprocessing import Process, Queue
 from caffe._caffe import RawBlobVec
 from sklearn import preprocessing
-import json
+import yaml
 
 class TripletLayer(caffe.Layer):
 
