@@ -127,17 +127,7 @@ scp astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/log
 
 # once we determine a good learning rate, update models/solver/solver.prototxt to reflect that learning rate
 # train, storing log information
-screen -S tc_train
+screen -S train
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 $CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01/
 # scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr01 ~/Desktop
-
-screen -S tc_train_lr001
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
-$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001/
-# scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr001 ~/Desktop
-
-screen -S tc_train_lr1
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
-$CAFFE_ROOT/tools/extra/parse_log.py /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/caffe.INFO /project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr0001/
-# scp -r astylianou@focus.cse.wustl.edu:/project/focus/abby/tc_tripletloss/models/logs/traffickcam/lr1/caffe.INFO.t* ~/Desktop
