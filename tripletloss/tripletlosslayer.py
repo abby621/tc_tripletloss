@@ -56,6 +56,7 @@ class TripletLayer(caffe.Layer):
             # an = np.sum(np.abs(a - n))
 
             # margin is the distance away that the negative examples need to be
+            print ap, an
             dist = (self.margin + ap - an)
             _loss = max(dist,0.0)
             if i == 0:
