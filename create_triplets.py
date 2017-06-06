@@ -1,13 +1,13 @@
+# =========== if we need to compute features, start here, else jump down ====================
 import csv
 import numpy as np
 import random
 import os
-
-# =========== if we need to compute features, start here, else jump down ====================
 import caffe
 import cv2
 from caffe.io import blobproto_to_array
 from caffe.proto import caffe_pb2
+from sklearn import preprocessing
 
 def getFeats(ims,net,feat_layer):
     net.blobs['data'].reshape(len(ims),3,227,227)
@@ -69,15 +69,28 @@ classes_0_ind = {}
 for ix in range(0,len(classes)):
     classes_0_ind[classes[ix]] = ix
 
-allFeats = np.empty((len(allIms),365))
+allFeats = np.empty((len(allIms),4096))
 inds = range(0,len(allIms),100)
 ctr = 0
 for ind in inds:
     print ctr, ' of ', len(inds)
     ims = allIms[ind:ind+100]
-    feat = getFeats(ims,net,'fc8')
+    feat = getFeats(ims,net,'fc7')
+    feat2 = np.asarray([preprocessing.normalize(f.reshape(1,-1), norm='l2')[0] for f in feat])
     allFeats[ind:ind+100,:] = feat.squeeze()
     ctr += 1
+
+#
+# allFeats = np.empty((10000,4096))
+# inds = range(0,10000,100)
+# ctr = 1
+# for ind in inds:
+#     print ctr, ' of ', len(inds)
+#     ims = allIms[ind:ind+100]
+#     feat = getFeats(ims,net,'fc7')
+#     feat2 = np.asarray([preprocessing.normalize(f.reshape(1,-1), norm='l2')[0] for f in feat])
+#     allFeats[ind:ind+100,:] = feat2.squeeze()
+#     ctr += 1
 
 np.save('/project/focus/abby/tc_tripletloss/classes.npy',allClasses)
 np.save('/project/focus/abby/tc_tripletloss/ims.npy',np.asarray(allIms))
@@ -85,24 +98,31 @@ np.save('/project/focus/abby/tc_tripletloss/feats.npy',allFeats)
 np.save('/project/focus/abby/tc_tripletloss/classes_0_ind.npy',classes_0_ind)
 
 # =========== if we loaded from files, start here:
+import csv
+import numpy as np
+import random
+import os
+
 def getDist(feat,otherFeat):
     dist = (otherFeat - feat)**2
     dist = np.sum(dist)
     dist = np.sqrt(dist)
     return dist
 
-allClasses = np.load('/project/focus/abby/tc_tripletloss/classes.npy')
-allIms = np.load('/project/focus/abby/tc_tripletloss/ims.npy')
-allFeats = np.load('/project/focus/abby/tc_tripletloss/feats.npy')
-classes_0_ind = np.load('/project/focus/abby/tc_tripletloss/classes_0_ind.npy').item()
-classes = classes_0_ind.keys()
+# allClasses = np.load('/project/focus/abby/tc_tripletloss/classes.npy')
+# allIms = np.load('/project/focus/abby/tc_tripletloss/ims.npy')
+# allFeats = np.load('/project/focus/abby/tc_tripletloss/feats.npy')
+# classes_0_ind = np.load('/project/focus/abby/tc_tripletloss/classes_0_ind.npy').item()
+# classes = classes_0_ind.keys()
 
 allTriplets = []
+numFeats = len(allFeats) # this is just for when we're sampling fewer than the whole set of features
+distThresh = .9
 for cls in classes:
     print cls
     class_0_ind = classes_0_ind[cls]
-    posInds = np.where(allClasses==int(cls))[0]
-    negInds = np.where(allClasses!=int(cls))[0]
+    posInds = [n for n in np.where(allClasses==int(cls))[0] if n < numFeats]
+    negInds = [n for n in np.where(allClasses!=int(cls))[0] if n < numFeats]
     if len(posInds) > 1:
         for ix in range(0,len(posInds)):
             anchorIm = allIms[posInds[ix]]
@@ -116,16 +136,25 @@ for cls in classes:
                 positiveIm = allIms[posInd]
                 positiveFeat = allFeats[posInd]
                 posDist = getDist(anchorFeat,positiveFeat)
-                if posDist < 32:
+                if posDist < distThresh:
                     # pick a negative example from the possible negative examples
                     negDist = 1000000
                     tries = 0
-                    while negDist > posDist and tries < 100:
+                    while negDist > distThresh and tries < 100:
                         tries += 1
                         negInd = random.choice(negInds)
                         negFeat = allFeats[negInd]
                         negDist = getDist(anchorFeat,negFeat)
-                        if negDist <= posDist:
+                        # we want to make more of our data to be easy (but make it a soft requirement -- don't try more than 100 times per triplet)
+                        relDist = negDist - posDist
+                        makeEasy = random.random() <= .45
+                        while makeEasy and relDist < .5 and tries < 100:
+                                tries += 1
+                                negInd = random.choice(negInds)
+                                negFeat = allFeats[negInd]
+                                negDist = getDist(anchorFeat,negFeat)
+                                relDist = negDist - posDist
+                        if negDist < distThresh:
                             negativeIm = allIms[negInd]
                             negativeImClass = allClasses[negInd]
                             negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
