@@ -65,6 +65,7 @@ class TripletLayer(caffe.Layer):
             loss += _loss
 
         loss = (loss/(2*(bottom[0]).num))
+        print 'loss (whole batch): ', loss
         top[0].data[...] = loss
 
 
