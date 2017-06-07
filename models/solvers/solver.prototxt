@@ -1,5 +1,5 @@
 net: "/project/focus/abby/tc_tripletloss/models/train/train.prototxt"
-test_iter: 10
+test_iter: 4
 test_interval: 500
 base_lr: 0.01
 lr_policy: "step"

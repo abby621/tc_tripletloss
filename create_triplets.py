@@ -24,8 +24,8 @@ def getFeats(ims,net,feat_layer):
     feat = net.blobs[feat_layer].data.copy()
     return feat
 
-caffe.set_device(0)
 caffe.set_mode_gpu()
+caffe.set_device(0)
 
 net_model = '/project/focus/abby/tc_tripletloss/models/deploy/deploy.prototxt'
 net_weights = '/project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel'
@@ -80,18 +80,6 @@ for ind in inds:
     allFeats[ind:ind+100,:] = feat.squeeze()
     ctr += 1
 
-#
-# allFeats = np.empty((10000,4096))
-# inds = range(0,10000,100)
-# ctr = 1
-# for ind in inds:
-#     print ctr, ' of ', len(inds)
-#     ims = allIms[ind:ind+100]
-#     feat = getFeats(ims,net,'fc7')
-#     feat2 = np.asarray([preprocessing.normalize(f.reshape(1,-1), norm='l2')[0] for f in feat])
-#     allFeats[ind:ind+100,:] = feat2.squeeze()
-#     ctr += 1
-
 np.save('/project/focus/abby/tc_tripletloss/classes.npy',allClasses)
 np.save('/project/focus/abby/tc_tripletloss/ims.npy',np.asarray(allIms))
 np.save('/project/focus/abby/tc_tripletloss/feats.npy',allFeats)
@@ -109,17 +97,23 @@ def getDist(feat,otherFeat):
     dist = np.sqrt(dist)
     return dist
 
-# allClasses = np.load('/project/focus/abby/tc_tripletloss/classes.npy')
-# allIms = np.load('/project/focus/abby/tc_tripletloss/ims.npy')
-# allFeats = np.load('/project/focus/abby/tc_tripletloss/feats.npy')
-# classes_0_ind = np.load('/project/focus/abby/tc_tripletloss/classes_0_ind.npy').item()
-# classes = classes_0_ind.keys()
+allClasses = np.load('/project/focus/abby/tc_tripletloss/classes.npy')
+allIms = np.load('/project/focus/abby/tc_tripletloss/ims.npy')
+allFeats = np.load('/project/focus/abby/tc_tripletloss/feats.npy')
+classes_0_ind = np.load('/project/focus/abby/tc_tripletloss/classes_0_ind.npy').item()
+classes = classes_0_ind.keys()
 
 allTriplets = []
+allDists = []
 numFeats = len(allFeats) # this is just for when we're sampling fewer than the whole set of features
-distThresh = .9
+distThresh = .9 # our examples must be less than this threshold
+negativeMultiplier = 1.15 # but let our negative example be distThresh * negativeMultiplier away
+numEasy = 0
+numMedium = 0
+numHard = 0
 for cls in classes:
-    print cls
+    print 'Class: ', cls
+    print 'Easy: ',numEasy,' Medium: ',numMedium, ' Hard: ',numHard
     class_0_ind = classes_0_ind[cls]
     posInds = [n for n in np.where(allClasses==int(cls))[0] if n < numFeats]
     negInds = [n for n in np.where(allClasses!=int(cls))[0] if n < numFeats]
@@ -136,9 +130,9 @@ for cls in classes:
                 positiveIm = allIms[posInd]
                 positiveFeat = allFeats[posInd]
                 posDist = getDist(anchorFeat,positiveFeat)
-                if posDist < distThresh:
+                if posDist < distThresh and posDist > 0:
                     # pick a negative example from the possible negative examples
-                    negDist = 1000000
+                    negDist = 10000000
                     tries = 0
                     while negDist > distThresh and tries < 100:
                         tries += 1
@@ -146,17 +140,30 @@ for cls in classes:
                         negFeat = allFeats[negInd]
                         negDist = getDist(anchorFeat,negFeat)
                         # we want to make more of our data to be easy (but make it a soft requirement -- don't try more than 100 times per triplet)
-                        relDist = negDist - posDist
-                        makeEasy = random.random() <= .45
-                        while makeEasy and relDist < .5 and tries < 100:
+                        bestRelDist = negDist - posDist
+                        bestNegInd = negInd
+                        bestNegFeat = negFeat
+                        makeEasy = random.random() <= .3
+                        while makeEasy and bestRelDist < .5 and tries < 100:
                                 tries += 1
                                 negInd = random.choice(negInds)
                                 negFeat = allFeats[negInd]
                                 negDist = getDist(anchorFeat,negFeat)
                                 relDist = negDist - posDist
-                        if negDist < distThresh:
-                            negativeIm = allIms[negInd]
-                            negativeImClass = allClasses[negInd]
+                                if relDist > bestRelDist:
+                                    bestRelDist = relDist
+                                    bestNegInd = negInd
+                                    bestNegFeat = negFeat
+                        if negDist < distThresh*negativeMultiplier:
+                            if bestRelDist > 0.5:
+                                numEasy += 1
+                            elif bestRelDist < 0:
+                                numHard += 1
+                            else:
+                                numMedium += 1
+                            allDists.append(bestRelDist)
+                            negativeIm = allIms[bestNegInd]
+                            negativeImClass = allClasses[bestNegInd]
                             negativeImClass_0_ind = classes_0_ind[str(negativeImClass)]
                             # add this triplet to our list of all triplets
                             theseTriplets.append((anchorIm, str(class_0_ind), positiveIm, str(class_0_ind), negativeIm, str(negativeImClass_0_ind)))
