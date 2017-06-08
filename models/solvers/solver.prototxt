@@ -1,5 +1,4 @@
 net: "/project/focus/abby/tc_tripletloss/models/train/train.prototxt"
-type: "Adam"
 test_iter: 4
 test_interval: 500
 base_lr: 0.01
@@ -13,3 +12,4 @@ weight_decay: 0.0005
 snapshot: 1000
 snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/traffickcam/lr01_"
 solver_mode: GPU
+type: "Adam"

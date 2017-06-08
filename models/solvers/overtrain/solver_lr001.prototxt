@@ -1,5 +1,4 @@
 net: "/project/focus/abby/tc_tripletloss/models/train/overtrain.prototxt"
-type: "Adam"
 test_iter: 1
 test_interval: 10
 base_lr: 0.001
@@ -11,5 +10,6 @@ max_iter: 10000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 10000
-snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/traffickcam/overtrain/lr001_"
+snapshot_prefix: "/project/focus/abby/tc_triapletloss/models/outputs/traffickcam/overtrain/lr001_"
 solver_mode: GPU
+type: "Adam"
