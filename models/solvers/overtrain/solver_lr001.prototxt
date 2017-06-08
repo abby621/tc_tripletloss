@@ -12,4 +12,3 @@ weight_decay: 0.0005
 snapshot: 10000
 snapshot_prefix: "/project/focus/abby/tc_triapletloss/models/outputs/traffickcam/overtrain/lr001_"
 solver_mode: GPU
-type: "Adam"
