@@ -6,9 +6,9 @@ lr_policy: "step"
 gamma: 0.1
 stepsize: 200000
 display: 10
-max_iter: 10000
+max_iter: 50000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 10000
+snapshot: 50000
 snapshot_prefix: "/project/focus/abby/tc_tripletloss/models/outputs/traffickcam/overtrain/lr0001_"
 solver_mode: GPU

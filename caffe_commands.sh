@@ -25,14 +25,20 @@ screen -S lr05
 GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr05/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr05.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
 # if those are too high:
 screen -S lr001
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
 screen -S lr005
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
 #
 screen -S lr0001
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 1
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0001/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
 screen -S lr0005
-GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 0
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
+
+# testing the no residual code changes
+screen -S lr0001
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0001_no_residual/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0001.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 2
+screen -S lr0005
+GLOG_log_dir=/project/focus/abby/tc_tripletloss/models/logs/traffickcam/overtrain/lr0005_no_residual/ $CAFFE_ROOT/build/tools/caffe train -solver /project/focus/abby/tc_tripletloss/models/solvers/overtrain/solver_lr0005.prototxt -weights /project/focus/abby/tc_tripletloss/models/alexnet_places365.caffemodel -gpu 3
 
 # once they've run long enough to over train, close the screens
 screen -X -S lr1 quit
