@@ -73,21 +73,21 @@ class TripletLayer(caffe.Layer):
         count = 0
         if propagate_down[0]:
             for i in range((bottom[0]).num):
-                # if not i in self.no_residual_list:
-                x_a = bottom[0].data[i]
-                x_p = bottom[1].data[i]
-                x_n = bottom[2].data[i]
+                if not i in self.no_residual_list:
+                    x_a = bottom[0].data[i]
+                    x_p = bottom[1].data[i]
+                    x_n = bottom[2].data[i]
 
-                #print x_a,x_p,x_n
-                bottom[0].diff[i] =  self.a*((x_n - x_p)/((bottom[0]).num))
-                bottom[1].diff[i] =  self.a*((x_p - x_a)/((bottom[0]).num))
-                bottom[2].diff[i] =  self.a*((x_a - x_n)/((bottom[0]).num))
+                    #print x_a,x_p,x_n
+                    bottom[0].diff[i] =  self.a*((x_n - x_p)/((bottom[0]).num))
+                    bottom[1].diff[i] =  self.a*((x_p - x_a)/((bottom[0]).num))
+                    bottom[2].diff[i] =  self.a*((x_a - x_n)/((bottom[0]).num))
 
-                count += 1
-                # else:
-                #     bottom[0].diff[i] = np.zeros(shape(bottom[0].data)[1])
-                #     bottom[1].diff[i] = np.zeros(shape(bottom[0].data)[1])
-                #     bottom[2].diff[i] = np.zeros(shape(bottom[0].data)[1])
+                    count += 1
+                else:
+                    bottom[0].diff[i] = np.zeros(shape(bottom[0].data)[1])
+                    bottom[1].diff[i] = np.zeros(shape(bottom[0].data)[1])
+                    bottom[2].diff[i] = np.zeros(shape(bottom[0].data)[1])
 
         #print 'select gradient_loss:',bottom[0].diff[0][0]
         #print shape(bottom[0].diff),shape(bottom[1].diff),shape(bottom[2].diff)
