@@ -74,9 +74,9 @@ class TripletLayer(caffe.Layer):
         if propagate_down[0]:
             for i in range((bottom[0]).num):
                 if not i in self.no_residual_list:
-                    x_a = bottom[0].data[i]
-                    x_p = bottom[1].data[i]
-                    x_n = bottom[2].data[i]
+                    x_a = bottom[0].data[i] # embedding of the anchor image
+                    x_p = bottom[1].data[i] # embedding of the + image
+                    x_n = bottom[2].data[i] # embedding on the - image
 
                     #print x_a,x_p,x_n
                     bottom[0].diff[i] =  self.a*((x_n - x_p)/((bottom[0]).num))
